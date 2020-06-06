@@ -20,7 +20,7 @@ public class Categories {
     @NotNull
     private String name;
 
-    @ManyToMany (mappedBy = "categories")
+    @ManyToMany (mappedBy = "categories", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Product> productList = new HashSet<>();
 
     public Categories() {

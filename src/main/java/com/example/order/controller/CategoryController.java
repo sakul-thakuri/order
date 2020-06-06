@@ -40,4 +40,20 @@ public class CategoryController {
              return ResponseEntity.ok(categories);
          }
     }
+
+    @PutMapping("{categoryId}/products")
+    public ResponseEntity<?> addProductToCategories (@PathVariable("categoryId") Long categoryId,
+                                                     @RequestBody List<Long> productsId) {
+        Categories category = categoryService.findCategory(categoryId);
+        if(category == null) {
+            return new ResponseEntity<>("category not found", HttpStatus.NOT_FOUND);
+        }
+        try {
+            categoryService.addProductsToCategory(category, productsId);
+            return new ResponseEntity<>("product added successfully", HttpStatus.OK);
+        }
+        catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("error occurred with provided category", HttpStatus.BAD_REQUEST);
+        }
+    }
 }
