@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,6 +29,8 @@ public class Product {
     private String ebtFlag;
     private String availableOnClickStatus;
     private String belowMinimumAdvertisedPrice;
+    private Double price;
+
     // private Set<FulfillmentOption> fulfillmentOptions = new HashSet<>();
     // private List<String> images = new ArrayList<>();
     // private Set<FulfillmentDetails> fulfillmentDetails = new HashSet<>();
@@ -37,10 +40,6 @@ public class Product {
             joinColumns = {@JoinColumn(name = "product_id")},
             inverseJoinColumns = {@JoinColumn (name = "category_id")})
     private Set<Categories> categories = new HashSet<>();
-
-
-    @ManyToMany(mappedBy = "products")
-    private Set<Order> orderList = new HashSet<>();
 
 
     public Product() {
@@ -60,14 +59,6 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Set<Order> getOrderList() {
-        return orderList;
-    }
-
-    public void setOrderList(Set<Order> orderList) {
-        this.orderList = orderList;
     }
 
     public String getAgeRestricted() {
@@ -164,5 +155,13 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

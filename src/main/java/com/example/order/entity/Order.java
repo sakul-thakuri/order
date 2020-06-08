@@ -1,5 +1,7 @@
 package com.example.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -9,12 +11,15 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToMany (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "order_product",
             joinColumns = {@JoinColumn(name = "order_id")},
             inverseJoinColumns = {@JoinColumn(name = "product_id")})
@@ -26,9 +31,12 @@ public class Order {
     @Column (updatable = false)
     private Date creationTime;
 
-   // private List<LineItem> lineItems;
+    @OneToMany (mappedBy = "order", cascade = {CascadeType.ALL})
+    private List<LineItem> lineItems;
 
-    private long customerId;
+    @ManyToOne
+    @JoinColumn (name = "customer_id")
+    private Customer customer;
     private String purchaseType;
     private double discountedServiceCharge;
     private double grandTotal;
@@ -45,9 +53,9 @@ public class Order {
     private String hasPendingRefund;
     private String hasRefundableProduct;
     private double totalRefund;
-    private String modifiable;
-    private String cancelable;
-    private Integer itemsCount;
+    private boolean modifiable;
+    private boolean cancelable;
+    private long itemsCount;
 
     public Order() {
     }
@@ -84,12 +92,12 @@ public class Order {
         this.creationTime = creationTime;
     }
 
-    public long getCustomerId() {
-        return customerId;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(long customerId) {
-        this.customerId = customerId;
+    public void setCustomer(Customer customerId) {
+        this.customer = customerId;
     }
 
     public String getPurchaseType() {
@@ -220,27 +228,35 @@ public class Order {
         this.totalRefund = totalRefund;
     }
 
-    public String getModifiable() {
+    public boolean isModifiable() {
         return modifiable;
     }
 
-    public void setModifiable(String modifiable) {
+    public void setModifiable(boolean modifiable) {
         this.modifiable = modifiable;
     }
 
-    public String getCancelable() {
+    public boolean isCancelable() {
         return cancelable;
     }
 
-    public void setCancelable(String cancelable) {
+    public void setCancelable(boolean cancelable) {
         this.cancelable = cancelable;
     }
 
-    public Integer getItemsCount() {
+    public long getItemsCount() {
         return itemsCount;
     }
 
-    public void setItemsCount(Integer itemsCount) {
+    public void setItemsCount(long itemsCount) {
         this.itemsCount = itemsCount;
+    }
+
+    public List<LineItem> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(List<LineItem> lineItems) {
+        this.lineItems = lineItems;
     }
 }

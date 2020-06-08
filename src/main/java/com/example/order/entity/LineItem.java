@@ -1,18 +1,33 @@
 package com.example.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class LineItem {
 
     @Id
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn (name = "product_id")
+    Product product;
+
+    @ManyToOne
+    @JoinColumn (name = "order_id")
+    Order order;
+    private long quantity;
     private String description;
-    private Double unitPrice;
+    private double unitPrice;
     private String specialInstruction;
     private String imageLocation;
     private boolean isRefundable;
@@ -42,11 +57,11 @@ public class LineItem {
         this.description = description;
     }
 
-    public Double getUnitPrice() {
+    public double getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(Double unitPrice) {
+    public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
     }
 
@@ -104,5 +119,29 @@ public class LineItem {
 
     public void setQuantityPendingRefunds(long quantityPendingRefunds) {
         this.quantityPendingRefunds = quantityPendingRefunds;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }
