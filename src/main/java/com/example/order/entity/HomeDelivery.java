@@ -1,28 +1,39 @@
 package com.example.order.entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Entity
-public class HomeDelivery {
+public class HomeDelivery extends DeliveryInfo{
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    Long id;
+    long id;
+    String address;
+    @CreationTimestamp
     Date beginDate;
     Date endDate;
-    Date locationTimeZone;
-    String address;
-
+    TimeZone locationTimeZone;
 
     public HomeDelivery() {
     }
 
-    public Long getId() {
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -42,19 +53,11 @@ public class HomeDelivery {
         this.endDate = endDate;
     }
 
-    public Date getLocationTimeZone() {
+    public TimeZone getLocationTimeZone() {
         return locationTimeZone;
     }
 
-    public void setLocationTimeZone(Date locationTimeZone) {
+    public void setLocationTimeZone(TimeZone locationTimeZone) {
         this.locationTimeZone = locationTimeZone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 }

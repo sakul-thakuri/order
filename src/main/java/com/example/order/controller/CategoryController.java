@@ -1,7 +1,6 @@
 package com.example.order.controller;
 
 import com.example.order.entity.Categories;
-import com.example.order.entity.Product;
 import com.example.order.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

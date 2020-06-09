@@ -1,7 +1,10 @@
 package com.example.order.controller;
 
+import com.example.order.Pojos.OrderRequest;
+import com.example.order.Pojos.OrderResponse;
 import com.example.order.entity.Customer;
 import com.example.order.entity.Order;
+import com.example.order.exceptions.Exceptions;
 import com.example.order.repository.CustomerRepository;
 import com.example.order.service.OrderService;
 import org.springframework.http.HttpStatus;
@@ -16,27 +19,36 @@ import java.util.Map;
 public class OrderController {
 
     private OrderService orderService;
+    private CustomerRepository customerRepository;
 
-    OrderController (OrderService orderService) {
+    OrderController (OrderService orderService, CustomerRepository customerRepository) {
         this.orderService = orderService;
+        this.customerRepository = customerRepository;
     }
 
-    @PostMapping("/{customerId}")
-    public ResponseEntity<?> placeOrder (@PathVariable ("customerId") Long customerId,
-                                       @RequestBody Map<Long, Integer> products) {
+    @PostMapping("")
+    public ResponseEntity<?> placeOrder (@RequestBody OrderRequest orderRequest) {
 
-        boolean result = orderService.saveOrder(customerId, products);
-        if(result) {
+        if(orderRequest.getCustomerId() == null || orderRequest.getProducts() == null) {
+            return new ResponseEntity<>("customerId or products found null", HttpStatus.BAD_REQUEST);
+        }
+        try {
+            orderService.saveOrder(orderRequest);
             return new ResponseEntity<>("success", HttpStatus.OK);
         }
-        else {
-            return new ResponseEntity<>("sorry somethings gone wrong", HttpStatus.BAD_GATEWAY);
+        catch (Exceptions.CustomerNotFoundException e){
+            e.printStackTrace();
+            return new ResponseEntity<>("customer not found", HttpStatus.NOT_FOUND);
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("something went wrong", HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("")
     public ResponseEntity<?> getOrders () {
-        List<Order> orderList = orderService.getOrders();
+        List<OrderResponse> orderList = orderService.getOrders();
 
         if(orderList == null) {
             return new ResponseEntity<>("there are no orders", HttpStatus.NOT_FOUND);
@@ -48,7 +60,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getSingleOrder (@PathVariable("orderId") Long orderId) {
-        Order order = orderService.findOrder(orderId);
+        OrderResponse order = orderService.findOneOrder(orderId);
         if(order ==null) {
             return new ResponseEntity<>("No order found with given id", HttpStatus.NOT_FOUND);
         }

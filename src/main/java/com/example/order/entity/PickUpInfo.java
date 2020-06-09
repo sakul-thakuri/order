@@ -1,27 +1,51 @@
 package com.example.order.entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Entity
-public class PickUpInfo {
+public class PickUpInfo extends DeliveryInfo{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    long id;
+    long storeId;
+    String address;
+    @CreationTimestamp
     Date beginDate;
     Date endDate;
-    Date locationTimeZone;
+    TimeZone locationTimeZone;
 
     public PickUpInfo() {
     }
 
-    public Long getId() {
+    @Override
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    @Override
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public long getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(long storeId) {
+        this.storeId = storeId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Date getBeginDate() {
@@ -40,11 +64,11 @@ public class PickUpInfo {
         this.endDate = endDate;
     }
 
-    public Date getLocationTimeZone() {
+    public TimeZone getLocationTimeZone() {
         return locationTimeZone;
     }
 
-    public void setLocationTimeZone(Date locationTimeZone) {
+    public void setLocationTimeZone(TimeZone locationTimeZone) {
         this.locationTimeZone = locationTimeZone;
     }
 }

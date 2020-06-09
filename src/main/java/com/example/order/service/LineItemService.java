@@ -1,6 +1,8 @@
 package com.example.order.service;
 
 import com.example.order.entity.LineItem;
+import com.example.order.entity.Order;
+import com.example.order.entity.Product;
 import com.example.order.repository.LineItemRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class LineItemService {
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("lineItem not found");
         }
-
+    }
+    public LineItem findLineItemByproductAndOrder (Product product, Order order) {
+       return lineItemRepository.findByProductAndOrder(product, order);
     }
 }

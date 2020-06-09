@@ -1,41 +1,26 @@
-package com.example.order.entity;
+package com.example.order.Pojos;
 
+import com.example.order.entity.Customer;
+import com.example.order.entity.DeliveryInfo;
+import com.example.order.entity.LineItem;
+import com.example.order.entity.Product;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity
-@Table(name = "orders")
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class OrderResponse {
+
     private long id;
-
-    @ManyToMany
-    @JoinTable(name = "order_product",
-            joinColumns = {@JoinColumn(name = "order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
     private List<Product> products = new ArrayList<>();
-
     private String status;
-
-    @CreationTimestamp
-    @Column (updatable = false)
     private Date creationTime;
-
-    @OneToMany (mappedBy = "order", cascade = {CascadeType.ALL})
     private List<LineItem> lineItems;
-
-    @ManyToOne
-    @JoinColumn (name = "customer_id")
     private Customer customer;
     private String purchaseType;
     private double discountedServiceCharge;
@@ -56,12 +41,7 @@ public class Order {
     private boolean modifiable;
     private boolean cancelable;
     private long itemsCount;
-
-    @OneToOne (cascade = {CascadeType.ALL})
     private DeliveryInfo deliveryInfo;
-
-    public Order() {
-    }
 
     public long getId() {
         return id;
@@ -95,12 +75,20 @@ public class Order {
         this.creationTime = creationTime;
     }
 
+    public List<LineItem> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(List<LineItem> lineItems) {
+        this.lineItems = lineItems;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customer customerId) {
-        this.customer = customerId;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     public String getPurchaseType() {
@@ -187,8 +175,8 @@ public class Order {
         return productAmountToBeRefunded;
     }
 
-    public void setProductAmountToBeRefunded(double productAmoutToBeRefunded) {
-        this.productAmountToBeRefunded = productAmoutToBeRefunded;
+    public void setProductAmountToBeRefunded(double productAmountToBeRefunded) {
+        this.productAmountToBeRefunded = productAmountToBeRefunded;
     }
 
     public double getTaxAmountToBeRefunded() {
@@ -255,13 +243,6 @@ public class Order {
         this.itemsCount = itemsCount;
     }
 
-    public List<LineItem> getLineItems() {
-        return lineItems;
-    }
-
-    public void setLineItems(List<LineItem> lineItems) {
-        this.lineItems = lineItems;
-    }
 
     public DeliveryInfo getDeliveryInfo() {
         return deliveryInfo;

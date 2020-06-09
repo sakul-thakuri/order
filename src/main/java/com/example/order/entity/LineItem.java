@@ -1,6 +1,7 @@
 package com.example.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.Entity;
@@ -24,8 +25,9 @@ public class LineItem {
 
     @ManyToOne
     @JoinColumn (name = "order_id")
+    @JsonIgnore
     Order order;
-    private long quantity;
+    private Integer quantity;
     private String description;
     private double unitPrice;
     private String specialInstruction;
@@ -129,11 +131,11 @@ public class LineItem {
         this.product = product;
     }
 
-    public long getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(long quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
