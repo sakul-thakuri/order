@@ -31,7 +31,7 @@ public class Order {
     @Column (updatable = false)
     private Date creationTime;
 
-    @OneToMany (mappedBy = "order", cascade = {CascadeType.ALL})
+    @OneToMany (mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<LineItem> lineItems;
 
     @ManyToOne

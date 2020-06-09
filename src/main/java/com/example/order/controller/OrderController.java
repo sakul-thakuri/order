@@ -80,8 +80,8 @@ public class OrderController {
         }
     }
 
-//    @PutMapping("")
-//    public ResponseEntity<?> updateOrder (@RequestBody Order order) {
+//    @PutMapping("/{orderId}")
+//    public ResponseEntity<?> updateOrder (@PathVariable Long orderId) {
 //
 //    }
 

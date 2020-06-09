@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -17,7 +14,8 @@ import java.util.UUID;
 public class LineItem {
 
     @Id
-    private UUID id;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne
     @JoinColumn (name = "product_id")
@@ -43,11 +41,11 @@ public class LineItem {
     public LineItem() {
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(long id) {
         this.id = id;
     }
 

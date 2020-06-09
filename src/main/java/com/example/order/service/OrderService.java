@@ -36,12 +36,9 @@ public class OrderService {
     public void saveOrder(OrderRequest orderRequest) {
         long itemsCount = 0;
         boolean cancellable = orderRequest.isCancellable();
-        String purchaseType;
         double discountedServiceCharge = 2;
         double grandTotal = 0;
-        double lineSubTotal;
         double serviceCharge = 10;
-        double subTotal = 0;
         double taxTotal = 0;
         double total = 0;
         double discountTotal = 0;
@@ -130,7 +127,6 @@ public class OrderService {
 
     public LineItem createLineItem (Product product, Integer quantity, boolean isRefundable, Order order) {
         LineItem lineItem = new LineItem();
-        lineItem.setId(UUID.randomUUID());
         lineItem.setProduct(product);
         lineItem.setDescription(product.getDescription());
         lineItem.setQuantity(quantity);
@@ -203,9 +199,10 @@ public class OrderService {
             throw new NullPointerException("No order found for given id");
         }
 
-        for(LineItem lineItem : order.getLineItems()) {
-            lineItemService.deleteLineItem(lineItem);
+        if(!order.isCancelable()) {
+            throw new Exception("cannot cancel this order");
         }
+
         try {
             orderRepository.delete(order);
         }
@@ -236,5 +233,7 @@ public class OrderService {
 
         return pickUpInfo;
     }
+
+
 
 }
