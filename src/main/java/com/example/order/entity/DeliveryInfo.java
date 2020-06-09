@@ -1,5 +1,7 @@
 package com.example.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,6 +12,7 @@ public class DeliveryInfo {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     long id;
     @OneToOne
+    @JsonIgnore
     Order order;
 
     public DeliveryInfo() {

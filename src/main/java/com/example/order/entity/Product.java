@@ -31,9 +31,11 @@ public class Product {
     private String belowMinimumAdvertisedPrice;
     private Double price;
 
-    // private Set<FulfillmentOption> fulfillmentOptions = new HashSet<>();
-    // private List<String> images = new ArrayList<>();
-    // private Set<FulfillmentDetails> fulfillmentDetails = new HashSet<>();
+    @ManyToMany
+    private List<FulfillmentOptions> fulfillmentOptions;
+
+    @ManyToMany
+    private List<FulfillmentDetails> fulfillmentDetails;
 
     @ManyToMany (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable (name = "product_category",
@@ -163,5 +165,21 @@ public class Product {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public List<FulfillmentOptions> getFulfillmentOptions() {
+        return fulfillmentOptions;
+    }
+
+    public void setFulfillmentOptions(List<FulfillmentOptions> fulfillmentOptions) {
+        this.fulfillmentOptions = fulfillmentOptions;
+    }
+
+    public List<FulfillmentDetails> getFulfillmentDetails() {
+        return fulfillmentDetails;
+    }
+
+    public void setFulfillmentDetails(List<FulfillmentDetails> fulfillmentDetails) {
+        this.fulfillmentDetails = fulfillmentDetails;
     }
 }

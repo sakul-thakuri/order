@@ -10,6 +10,8 @@ public class OrderRequest {
     private boolean cancellable;
     private boolean isRefundable;
     private boolean modifiable;
+    private String fulfillmentOption;
+    private long storeId;
     public Map<Long, Integer> getProducts() {
         return products;
     }
@@ -56,5 +58,21 @@ public class OrderRequest {
 
     public void setModifiable(boolean modifiable) {
         this.modifiable = modifiable;
+    }
+
+    public String getFulfillmentOption() {
+        return fulfillmentOption;
+    }
+
+    public void setFulfillmentOption(String fulfillmentOption) {
+        this.fulfillmentOption = fulfillmentOption;
+    }
+
+    public long getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(long storeId) {
+        this.storeId = storeId;
     }
 }

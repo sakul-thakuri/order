@@ -5,10 +5,11 @@ import com.example.order.Pojos.OrderResponse;
 import com.example.order.entity.*;
 import com.example.order.exceptions.Exceptions;
 import com.example.order.repository.CustomerRepository;
+import com.example.order.repository.FulfillmentDetailsRepository;
+import com.example.order.repository.FulfillmentOptionRepository;
 import com.example.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -17,14 +18,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductService productService;
     private final LineItemService lineItemService;
+    private final FulfillmentDetailsRepository fulfillmentDetailsRepository;
+    private final FulfillmentOptionRepository fulfillmentOptionRepository;
     private final CustomerRepository customerRepository;
 
     public OrderService(OrderRepository orderRepository, ProductService productService, LineItemService lineItemService,
-                        CustomerRepository customerRepository) {
+                        CustomerRepository customerRepository, FulfillmentOptionRepository fulfillmentOptionRepository,
+                        FulfillmentDetailsRepository fulfillmentDetailsRepository) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.lineItemService = lineItemService;
         this.customerRepository = customerRepository;
+        this.fulfillmentDetailsRepository = fulfillmentDetailsRepository;
+        this.fulfillmentOptionRepository = fulfillmentOptionRepository;
     }
 
     public void saveOrder(OrderRequest orderRequest) {
@@ -87,14 +93,19 @@ public class OrderService {
 
         grandTotal = total + taxTotal + serviceCharge - discountTotal;
 
+        if(orderRequest.getFulfillmentOption().equals("homedelivery")) {
+            order.setDeliveryInfo(createDeliveryInfo(order));
+        }
+        else if(orderRequest.getFulfillmentOption().equals("pickup")) {
+            Optional<FulfillmentDetails> fulfillmentDetails = fulfillmentDetailsRepository.findById(orderRequest.getStoreId());
+            if(fulfillmentDetails.isPresent()) {
+                order.setDeliveryInfo(createPickUpInfo(order, fulfillmentDetails.get()));
+            }
+            else {
+                throw new NullPointerException("store was not found");
+            }
 
-        HomeDelivery homeDelivery = new HomeDelivery();
-        homeDelivery.setAddress(order.getCustomer().getAddress());
-        homeDelivery.setEndDate(Calendar.getInstance().getTime());
-        homeDelivery.setLocationTimeZone(Calendar.getInstance().getTimeZone());
-        homeDelivery.setOrder(order);
-
-        order.setDeliveryInfo(homeDelivery);
+        }
 
         order.setDiscount(discount);
         order.setTaxTotal(taxTotal);
@@ -115,6 +126,7 @@ public class OrderService {
         }
 
     }
+
 
     public LineItem createLineItem (Product product, Integer quantity, boolean isRefundable, Order order) {
         LineItem lineItem = new LineItem();
@@ -201,6 +213,28 @@ public class OrderService {
             e.printStackTrace();
             throw new Exception("error occurred");
         }
-
     }
+
+    private DeliveryInfo createDeliveryInfo (Order order) {
+
+        HomeDelivery homeDelivery = new HomeDelivery();
+        homeDelivery.setAddress(order.getCustomer().getAddress());
+        homeDelivery.setEndDate(Calendar.getInstance().getTime());
+        homeDelivery.setLocationTimeZone(Calendar.getInstance().getTimeZone());
+        homeDelivery.setOrder(order);
+
+        return homeDelivery;
+    }
+
+    private DeliveryInfo createPickUpInfo(Order order, FulfillmentDetails fulfillmentDetails) {
+        PickUpInfo pickUpInfo = new PickUpInfo();
+        pickUpInfo.setAddress(fulfillmentDetails.getStoreAddress());
+        pickUpInfo.setEndDate(Calendar.getInstance().getTime());
+        pickUpInfo.setLocationTimeZone(Calendar.getInstance().getTimeZone());
+        pickUpInfo.setOrder(order);
+        pickUpInfo.setStoreId(fulfillmentDetails.getStoreId());
+
+        return pickUpInfo;
+    }
+
 }
