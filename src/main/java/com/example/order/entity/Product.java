@@ -47,6 +47,31 @@ public class Product {
     public Product() {
     }
 
+
+    public Product(Long id, String name, String description, String ageRestricted, boolean alcoholFlag,
+                   String customerFacingSize, String itemSizeUom, String upc, String taxGroupCode, String prop65,
+                   String ebtFlag, String availableOnClickStatus, String belowMinimumAdvertisedPrice, Double price,
+                   List<FulfillmentOptions> fulfillmentOptions, List<FulfillmentDetails> fulfillmentDetails,
+                   Set<Categories> categories) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.ageRestricted = ageRestricted;
+        this.alcoholFlag = alcoholFlag;
+        this.customerFacingSize = customerFacingSize;
+        this.itemSizeUom = itemSizeUom;
+        this.upc = upc;
+        this.taxGroupCode = taxGroupCode;
+        this.prop65 = prop65;
+        this.ebtFlag = ebtFlag;
+        this.availableOnClickStatus = availableOnClickStatus;
+        this.belowMinimumAdvertisedPrice = belowMinimumAdvertisedPrice;
+        this.price = price;
+        this.fulfillmentOptions = fulfillmentOptions;
+        this.fulfillmentDetails = fulfillmentDetails;
+        this.categories = categories;
+    }
+
     public Long getId() {
         return id;
     }

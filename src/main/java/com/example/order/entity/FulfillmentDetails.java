@@ -13,6 +13,11 @@ public class FulfillmentDetails {
     public FulfillmentDetails() {
     }
 
+    public FulfillmentDetails(long storeId, String storeAddress) {
+        this.storeId = storeId;
+        this.storeAddress = storeAddress;
+    }
+
     public long getStoreId() {
         return storeId;
     }

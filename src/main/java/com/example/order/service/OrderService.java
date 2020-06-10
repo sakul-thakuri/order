@@ -134,7 +134,13 @@ public class OrderService {
 
 
     public List<OrderResponse> getOrders() {
-        List<Order> orders = orderRepository.findAll();
+        List<Order> orders;
+        try {
+            orders = orderRepository.findAll();
+        }
+        catch (NullPointerException e) {
+            throw new NullPointerException("there are no orders");
+        }
         List<OrderResponse> orderResponses = new ArrayList<>();
         for(Order order : orders) {
             orderResponses.add(fillOrderResponse(order));
@@ -143,6 +149,7 @@ public class OrderService {
     }
 
     public OrderResponse findOneOrder (Long orderId) {
+
         Optional<Order> order = orderRepository.findById(orderId);
         if(order.isPresent()) {
             return fillOrderResponse(order.get());

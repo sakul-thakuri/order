@@ -43,6 +43,45 @@ public class OrderResponse {
     private long itemsCount;
     private DeliveryInfo deliveryInfo;
 
+    public OrderResponse() {
+    }
+
+    public OrderResponse(long id, List<Product> products, String status, Date creationTime,
+                         List<LineItem> lineItems, Customer customer, String purchaseType,
+                         double discountedServiceCharge, double grandTotal, double lineSubTotal,
+                         double serviceCharge, double subTotal, double taxTotal, double total,
+                         double discountTotal, double discountPercent, double productAmountToBeRefunded,
+                         double taxAmountToBeRefunded, double discount, String hasPendingRefund,
+                         String hasRefundableProduct, double totalRefund, boolean modifiable, boolean cancelable,
+                         long itemsCount, DeliveryInfo deliveryInfo) {
+        this.id = id;
+        this.products = products;
+        this.status = status;
+        this.creationTime = creationTime;
+        this.lineItems = lineItems;
+        this.customer = customer;
+        this.purchaseType = purchaseType;
+        this.discountedServiceCharge = discountedServiceCharge;
+        this.grandTotal = grandTotal;
+        this.lineSubTotal = lineSubTotal;
+        this.serviceCharge = serviceCharge;
+        this.subTotal = subTotal;
+        this.taxTotal = taxTotal;
+        this.total = total;
+        this.discountTotal = discountTotal;
+        this.discountPercent = discountPercent;
+        this.productAmountToBeRefunded = productAmountToBeRefunded;
+        this.taxAmountToBeRefunded = taxAmountToBeRefunded;
+        this.discount = discount;
+        this.hasPendingRefund = hasPendingRefund;
+        this.hasRefundableProduct = hasRefundableProduct;
+        this.totalRefund = totalRefund;
+        this.modifiable = modifiable;
+        this.cancelable = cancelable;
+        this.itemsCount = itemsCount;
+        this.deliveryInfo = deliveryInfo;
+    }
+
     public long getId() {
         return id;
     }

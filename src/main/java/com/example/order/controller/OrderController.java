@@ -50,19 +50,19 @@ public class OrderController {
     @GetMapping("")
     @ApiOperation(value = "get all the list of orders", response = Order.class)
     public ResponseEntity<?> getOrders () {
-        List<OrderResponse> orderList = orderService.getOrders();
-
-        if(orderList == null) {
-            return new ResponseEntity<>("there are no orders", HttpStatus.NOT_FOUND);
+        List<OrderResponse> orderResponses;
+        try {
+            orderResponses = orderService.getOrders();
+           return ResponseEntity.ok(orderResponses);
         }
-        else {
-            return ResponseEntity.ok(orderList);
+        catch (NullPointerException e) {
+            return new ResponseEntity<>("there are no orders", HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/{orderId}")
     @ApiOperation(value = "fetch an order of provided id", response = Order.class)
-    public ResponseEntity<?> getSingleOrder (@PathVariable("orderId") Long orderId) {
+    public ResponseEntity<?> getOrder (@PathVariable("orderId") Long orderId) {
         OrderResponse order = orderService.findOneOrder(orderId);
         if(order ==null) {
             return new ResponseEntity<>("No order found with given id", HttpStatus.NOT_FOUND);

@@ -41,6 +41,25 @@ public class LineItem {
     public LineItem() {
     }
 
+    public LineItem(long id, Product product, Order order, Integer quantity, String description,
+                    double unitPrice, String specialInstruction, String imageLocation, boolean isRefundable,
+                    long quantityRefunded, long quantityRefundable, long quantityCompletedRefunds,
+                    long quantityPendingRefunds) {
+        this.id = id;
+        this.product = product;
+        this.order = order;
+        this.quantity = quantity;
+        this.description = description;
+        this.unitPrice = unitPrice;
+        this.specialInstruction = specialInstruction;
+        this.imageLocation = imageLocation;
+        this.isRefundable = isRefundable;
+        this.quantityRefunded = quantityRefunded;
+        this.quantityRefundable = quantityRefundable;
+        this.quantityCompletedRefunds = quantityCompletedRefunds;
+        this.quantityPendingRefunds = quantityPendingRefunds;
+    }
+
     public long getId() {
         return id;
     }

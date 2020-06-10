@@ -14,6 +14,11 @@ public class FulfillmentOptions {
     public FulfillmentOptions() {
     }
 
+    public FulfillmentOptions(long id, String fulfillmentType) {
+        this.id = id;
+        this.fulfillmentType = fulfillmentType;
+    }
+
     public long getId() {
         return id;
     }
