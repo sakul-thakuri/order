@@ -12,6 +12,6 @@ import java.util.UUID;
 @Repository
 public interface LineItemRepository extends JpaRepository<LineItem, UUID> {
 
-    @Query("select l from LineItem l where l.product = ?1 and l.order = ?2")
-    LineItem findByProductAndOrder(Product product, Order order);
+    @Query("select l from LineItem l where l.order = ?1 and l.product = ?2")
+    LineItem findByProductAndOrder(Order order, Product product);
 }

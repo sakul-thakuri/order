@@ -27,7 +27,7 @@ public class LineItemService {
             throw new IllegalArgumentException("lineItem not found");
         }
     }
-    public LineItem findLineItemByproductAndOrder (Product product, Order order) {
-       return lineItemRepository.findByProductAndOrder(product, order);
+    public LineItem findLineItemByproductAndOrder (Order order, Product product) {
+       return lineItemRepository.findByProductAndOrder(order, product);
     }
 }

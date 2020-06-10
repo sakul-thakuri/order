@@ -43,12 +43,7 @@ public class OrderService {
         double total = 0;
         double discountTotal = 0;
         double discountPercent = orderRequest.getDiscountPercent();
-        double productAmountToBeRefunded;
-        double taxAmountToBeRefunded;
         double discount = 0;
-        String hasPendingRefund;
-        String hasRefundableProduct;
-        double totalRefund;
         boolean modifiable = orderRequest.isModifiable();
         boolean isRefundable = orderRequest.isRefundable();
         List<LineItem> lineItems = new ArrayList<>();
@@ -72,15 +67,14 @@ public class OrderService {
                 continue;
             }
             Integer quantity = map.getValue();
-            if(!productList.contains(product)) {
-                productList.add(product);
-            }
+            productList.add(product);
+
 
             productPrice = product.getPrice();
 
             total += (productPrice * quantity);
-            taxTotal += (productPrice * taxPercent)/100;
-            discount += ((productPrice * discountPercent)/100);
+            taxTotal += (productPrice * quantity * taxPercent)/100;
+            discount += ((productPrice * quantity * discountPercent)/100);
 
             lineItems.add(createLineItem(product, quantity, isRefundable, order));
             itemsCount += quantity;
@@ -104,6 +98,8 @@ public class OrderService {
 
         }
 
+        order.setDiscountPercent(discountPercent);
+        order.setDiscountedServiceCharge(discountedServiceCharge);
         order.setDiscount(discount);
         order.setTaxTotal(taxTotal);
         order.setTotal(total);
@@ -114,6 +110,7 @@ public class OrderService {
         order.setModifiable(modifiable);
         order.setProducts(productList);
         order.setLineItems(lineItems);
+        order.setServiceCharge(serviceCharge);
 
         try {
             orderRepository.save(order);
@@ -121,9 +118,7 @@ public class OrderService {
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("order found null");
         }
-
     }
-
 
     public LineItem createLineItem (Product product, Integer quantity, boolean isRefundable, Order order) {
         LineItem lineItem = new LineItem();
@@ -203,6 +198,7 @@ public class OrderService {
             throw new Exception("cannot cancel this order");
         }
 
+
         try {
             orderRepository.delete(order);
         }
@@ -235,5 +231,72 @@ public class OrderService {
     }
 
 
+    public void updateOrder(Long orderId, OrderRequest orderRequest) throws Exception {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        Order order;
+        if(orderOptional.isPresent()) {
+            order = orderOptional.get();
+        }
+        else {
+            throw new NullPointerException("order not found");
+        }
 
+        if(!order.isModifiable()) {
+            throw new Exception("cannot modify this order");
+        }
+
+        for(Map.Entry<Long, Integer> map : orderRequest.getProducts().entrySet()) {
+            Product product = productService.findById(map.getKey());
+            Integer quantity = map.getValue();
+            if(product == null) {
+                continue;
+            }
+            if(order.getProducts().contains(product)) {
+                LineItem lineItem = lineItemService.findLineItemByproductAndOrder(order, product);
+                lineItem.setQuantity(quantity);
+                lineItemService.saveLineItem(lineItem);
+            }
+            else {
+                List<Product> productList = order.getProducts();
+                productList.add(product);
+                LineItem lineItem = createLineItem(product, quantity, orderRequest.isRefundable(), order);
+                List<LineItem> lineItems = order.getLineItems();
+                lineItems.add(lineItem);
+
+                try {
+                    orderRepository.save(order);
+                }
+                catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("error occurred");
+                }
+            }
+        }
+
+        Double total =0.0;
+        Double taxTotal = 0.0;
+        Double taxPercent = 4.0;
+        Double discount = 0.0;
+        for(LineItem lineItem : order.getLineItems()) {
+            Double price = lineItem.getUnitPrice();
+            int quantity = lineItem.getQuantity();
+            total += price * quantity;
+            taxTotal += (price * quantity * taxPercent)/100;
+            discount += (price * quantity * order.getDiscountPercent())/100;
+        }
+        double discountTotal = discount + order.getDiscountedServiceCharge();
+        double grandTotal = total + taxTotal + order.getServiceCharge() - discountTotal;
+
+        order.setTotal(total);
+        order.setTaxTotal(taxTotal);
+        order.setDiscountPercent(discount);
+        order.setGrandTotal(grandTotal);
+        order.setDiscountTotal(discountTotal);
+
+        try {
+            orderRepository.save(order);
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("error occurred");
+        }
+     }
 }

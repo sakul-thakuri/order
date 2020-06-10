@@ -76,13 +76,24 @@ public class OrderController {
             return new ResponseEntity<>("delete successful", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("error occurred while deleting ", HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<>("error occurred while deleting order", HttpStatus.BAD_REQUEST);
         }
     }
 
-//    @PutMapping("/{orderId}")
-//    public ResponseEntity<?> updateOrder (@PathVariable Long orderId) {
-//
-//    }
+    @PutMapping("/{orderId}")
+    public ResponseEntity<?> updateOrder (@PathVariable("orderId") Long orderId, @RequestBody OrderRequest orderRequest) {
+
+        try {
+            orderService.updateOrder(orderId, orderRequest);
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Order with given id not found", HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("some error has occurred", HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
