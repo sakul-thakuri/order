@@ -35,7 +35,7 @@ public class OrderService {
         this.deliveryInfoService = deliveryInfoService;
     }
 
-    public void saveOrder(OrderRequest orderRequest) {
+    public void saveOrder(OrderRequest orderRequest) throws NoSuchFieldException {
         long itemsCount = 0;
         boolean cancellable = orderRequest.isCancellable();
         double discountedServiceCharge = 2;
@@ -90,15 +90,14 @@ public class OrderService {
             DeliveryInfo deliveryInfo = deliveryInfoService.saveDeliveryInfo(orderRequest, order);
             order.setDeliveryInfo(deliveryInfo);
         }
-        catch (IllegalArgumentException e) {
+        catch (NoSuchFieldException e) {
             logger.error(e.getMessage());
-            throw new IllegalArgumentException(e.getMessage());
+            throw new NoSuchFieldException(e.getMessage());
         }
         catch (NullPointerException e) {
             logger.error(e.getMessage());
             throw new NullPointerException(e.getMessage());
         }
-
 
         order.setDiscountPercent(discountPercent);
         order.setDiscountedServiceCharge(discountedServiceCharge);
@@ -121,8 +120,6 @@ public class OrderService {
             throw new IllegalArgumentException("order found null");
         }
     }
-
-
 
     public LineItem createLineItem (Product product, Integer quantity, boolean isRefundable, Order order) {
         LineItem lineItem = new LineItem();
@@ -191,7 +188,6 @@ public class OrderService {
         return order.orElse(null);
     }
 
-
     public void deleteOrder(Long orderId) throws Exception {
         Order order = this.findOrder(orderId);
         if(order == null) {
@@ -205,32 +201,9 @@ public class OrderService {
         }
         catch (Exception e) {
             e.printStackTrace();
-            throw new Exception("error occurred");
+            throw new IllegalArgumentException("Order found null");
         }
     }
-
-    private DeliveryInfo createDeliveryInfo (Order order) {
-
-        HomeDelivery homeDelivery = new HomeDelivery();
-        homeDelivery.setAddress(order.getCustomer().getAddress());
-        homeDelivery.setEndDate(Calendar.getInstance().getTime());
-        homeDelivery.setLocationTimeZone(Calendar.getInstance().getTimeZone());
-        homeDelivery.setOrder(order);
-
-        return homeDelivery;
-    }
-
-    private DeliveryInfo createPickUpInfo(Order order, FulfillmentDetails fulfillmentDetails) {
-        PickUpInfo pickUpInfo = new PickUpInfo();
-        pickUpInfo.setAddress(fulfillmentDetails.getStoreAddress());
-        pickUpInfo.setEndDate(Calendar.getInstance().getTime());
-        pickUpInfo.setLocationTimeZone(Calendar.getInstance().getTimeZone());
-        pickUpInfo.setOrder(order);
-        pickUpInfo.setStoreId(fulfillmentDetails.getStoreId());
-
-        return pickUpInfo;
-    }
-
 
     public void updateOrder(Long orderId, OrderRequest orderRequest) throws Exception {
         Optional<Order> orderOptional = orderRepository.findById(orderId);
@@ -253,9 +226,17 @@ public class OrderService {
                 continue;
             }
             if(order.getProducts().contains(product)) {
-                LineItem lineItem = lineItemService.findLineItemByproductAndOrder(order, product);
-                lineItem.setQuantity(quantity);
-                lineItemService.saveLineItem(lineItem);
+                LineItem lineItem;
+                try {
+                     lineItem = lineItemService.findLineItemByproductAndOrder(order, product);
+                     lineItem.setQuantity(quantity);
+                     lineItemService.saveLineItem(lineItem);
+                }
+                catch (NullPointerException e) {
+                    LineItem newLineItem = createLineItem(product, quantity, orderRequest.isRefundable(), order);
+                    newLineItem.setQuantity(quantity);
+                    lineItemService.saveLineItem(newLineItem);
+                }
             }
             else {
                 List<Product> productList = order.getProducts();
@@ -263,28 +244,29 @@ public class OrderService {
                 LineItem lineItem = createLineItem(product, quantity, orderRequest.isRefundable(), order);
                 List<LineItem> lineItems = order.getLineItems();
                 lineItems.add(lineItem);
-
                 try {
                     orderRepository.save(order);
                 }
                 catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("error occurred");
+                    throw new IllegalArgumentException("order could not be null");
                 }
             }
         }
-        Double total =0.0;
-        Double taxTotal = 0.0;
-        Double taxPercent = 4.0;
-        Double discount = 0.0;
+        double total =0.0;
+        double taxTotal = 0.0;
+        double taxPercent = 4.0;
+        double discount = 0.0;
+        double discountTotal;
+        double grandTotal;
         for(LineItem lineItem : order.getLineItems()) {
-            Double price = lineItem.getUnitPrice();
+            double price = lineItem.getUnitPrice();
             int quantity = lineItem.getQuantity();
             total += price * quantity;
             taxTotal += (price * quantity * taxPercent)/100;
             discount += (price * quantity * order.getDiscountPercent())/100;
         }
-        double discountTotal = discount + order.getDiscountedServiceCharge();
-        double grandTotal = total + taxTotal + order.getServiceCharge() - discountTotal;
+        discountTotal = discount + order.getDiscountedServiceCharge();
+        grandTotal = total + taxTotal + order.getServiceCharge() - discountTotal;
 
 
         try {
@@ -294,6 +276,10 @@ public class OrderService {
         catch (NullPointerException e) {
             logger.error(e.getMessage());
             throw new NullPointerException(e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }
 
         order.setCancelable(orderRequest.isCancellable());
@@ -307,7 +293,7 @@ public class OrderService {
             orderRepository.save(order);
         }
         catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("error occurred");
+            throw new IllegalArgumentException("order cannot be null");
         }
      }
 }

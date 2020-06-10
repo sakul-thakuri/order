@@ -51,11 +51,6 @@ public class ProductService {
             return false;
         }
     }
-
-    public Product findProductByProductName (String productName) {
-            return productRepository.findByName(productName);
-    }
-
     public Product findById (Long id) {
         Optional<Product> product = productRepository.findById(id);
         return product.orElse(null);

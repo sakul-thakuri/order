@@ -2,6 +2,7 @@ package com.example.order.controller;
 
 import com.example.order.entity.Categories;
 import com.example.order.service.CategoryService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class CategoryController {
     }
 
     @PostMapping("")
+    @ApiOperation(value = "create category")
     public ResponseEntity<?> addCategory (@RequestBody Categories category) {
         boolean res = categoryService.addCategory(category);
         if (res) {
@@ -30,6 +32,7 @@ public class CategoryController {
     }
 
     @GetMapping("")
+    @ApiOperation(value = "get list of category")
     public ResponseEntity<?> getCategories () {
          List<Categories> categories = categoryService.getCategories();
          if(categories.isEmpty()) {
@@ -41,6 +44,7 @@ public class CategoryController {
     }
 
     @PutMapping("{categoryId}/products")
+    @ApiOperation(value = "add product to category")
     public ResponseEntity<?> addProductToCategories (@PathVariable("categoryId") Long categoryId,
                                                      @RequestBody List<Long> productsId) {
         Categories category = categoryService.findCategory(categoryId);

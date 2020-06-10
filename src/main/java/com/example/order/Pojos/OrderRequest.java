@@ -1,5 +1,7 @@
 package com.example.order.Pojos;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,8 +12,25 @@ public class OrderRequest {
     private boolean cancellable;
     private boolean isRefundable;
     private boolean modifiable;
+    @ApiModelProperty(notes = "requires either 'homedelivery' or 'pickup' as input")
     private String fulfillmentOption;
     private long storeId;
+
+    public OrderRequest() {
+    }
+
+    public OrderRequest(Map<Long, Integer> products, Long customerId, Double discountPercent, boolean cancellable,
+                        boolean isRefundable, boolean modifiable, String fulfillmentOption, long storeId) {
+        this.products = products;
+        this.customerId = customerId;
+        this.discountPercent = discountPercent;
+        this.cancellable = cancellable;
+        this.isRefundable = isRefundable;
+        this.modifiable = modifiable;
+        this.fulfillmentOption = fulfillmentOption;
+        this.storeId = storeId;
+    }
+
     public Map<Long, Integer> getProducts() {
         return products;
     }

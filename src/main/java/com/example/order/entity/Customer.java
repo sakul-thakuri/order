@@ -26,6 +26,13 @@ public class Customer {
     public Customer() {
     }
 
+    public Customer(Long id, String name, String address, List<Order> orderList) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.orderList = orderList;
+    }
+
     public Long getId() {
         return id;
     }

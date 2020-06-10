@@ -19,7 +19,7 @@ public class DeliveryInfoService {
     }
 
 
-    public DeliveryInfo saveDeliveryInfo(OrderRequest orderRequest, Order order) {
+    public DeliveryInfo saveDeliveryInfo(OrderRequest orderRequest, Order order) throws NoSuchFieldException {
         if(orderRequest.getFulfillmentOption().equals("homedelivery")) {
             HomeDelivery homeDelivery = new HomeDelivery();
             homeDelivery.setAddress(order.getCustomer().getAddress());
@@ -43,6 +43,6 @@ public class DeliveryInfoService {
                 throw new NullPointerException("store was not found");
             }
         }
-       else throw new IllegalArgumentException("no delivery is available");
+       else throw new NoSuchFieldException("mentioned delivery option is not available");
     }
 }

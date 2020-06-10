@@ -2,6 +2,7 @@ package com.example.order.controller;
 
 import com.example.order.entity.Product;
 import com.example.order.service.ProductService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class ProductController {
     }
 
     @PostMapping ("")
+    @ApiOperation(value = "create product")
     public ResponseEntity<?> addProduct (@RequestBody Product product) {
         boolean res = productService.addProduct(product);
         if(res) {
@@ -30,6 +32,7 @@ public class ProductController {
     }
 
     @GetMapping("")
+    @ApiOperation(value = "get all products")
     public ResponseEntity<?> getProducts () {
         List<Product> productList = productService.findAllProducts();
         if(productList == null) {

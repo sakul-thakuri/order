@@ -20,6 +20,11 @@ public class LineItemService {
     }
 
     public LineItem findLineItemByproductAndOrder (Order order, Product product) {
-       return lineItemRepository.findByProductAndOrder(order, product);
+       try {
+           return lineItemRepository.findByProductAndOrder(order, product);
+       }
+       catch (NullPointerException e) {
+           throw new NullPointerException("no lineItem found for given arguments");
+       }
     }
 }
