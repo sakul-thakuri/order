@@ -19,14 +19,6 @@ public class LineItemService {
         lineItemRepository.save(lineItem);
     }
 
-    public void deleteLineItem (LineItem lineItem) {
-        try {
-            this.lineItemRepository.delete(lineItem);
-        }
-        catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("lineItem not found");
-        }
-    }
     public LineItem findLineItemByproductAndOrder (Order order, Product product) {
        return lineItemRepository.findByProductAndOrder(order, product);
     }

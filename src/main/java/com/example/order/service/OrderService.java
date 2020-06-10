@@ -8,6 +8,8 @@ import com.example.order.repository.CustomerRepository;
 import com.example.order.repository.FulfillmentDetailsRepository;
 import com.example.order.repository.FulfillmentOptionRepository;
 import com.example.order.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,19 +20,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductService productService;
     private final LineItemService lineItemService;
-    private final FulfillmentDetailsRepository fulfillmentDetailsRepository;
-    private final FulfillmentOptionRepository fulfillmentOptionRepository;
     private final CustomerRepository customerRepository;
+    private final DeliveryInfoService deliveryInfoService;
+
+    Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     public OrderService(OrderRepository orderRepository, ProductService productService, LineItemService lineItemService,
                         CustomerRepository customerRepository, FulfillmentOptionRepository fulfillmentOptionRepository,
-                        FulfillmentDetailsRepository fulfillmentDetailsRepository) {
+                        FulfillmentDetailsRepository fulfillmentDetailsRepository, DeliveryInfoService deliveryInfoService) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.lineItemService = lineItemService;
         this.customerRepository = customerRepository;
-        this.fulfillmentDetailsRepository = fulfillmentDetailsRepository;
-        this.fulfillmentOptionRepository = fulfillmentOptionRepository;
+        this.deliveryInfoService = deliveryInfoService;
     }
 
     public void saveOrder(OrderRequest orderRequest) {
@@ -84,19 +86,19 @@ public class OrderService {
 
         grandTotal = total + taxTotal + serviceCharge - discountTotal;
 
-        if(orderRequest.getFulfillmentOption().equals("homedelivery")) {
-            order.setDeliveryInfo(createDeliveryInfo(order));
+        try {
+            DeliveryInfo deliveryInfo = deliveryInfoService.saveDeliveryInfo(orderRequest, order);
+            order.setDeliveryInfo(deliveryInfo);
         }
-        else if(orderRequest.getFulfillmentOption().equals("pickup")) {
-            Optional<FulfillmentDetails> fulfillmentDetails = fulfillmentDetailsRepository.findById(orderRequest.getStoreId());
-            if(fulfillmentDetails.isPresent()) {
-                order.setDeliveryInfo(createPickUpInfo(order, fulfillmentDetails.get()));
-            }
-            else {
-                throw new NullPointerException("store was not found");
-            }
+        catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        catch (NullPointerException e) {
+            logger.error(e.getMessage());
+            throw new NullPointerException(e.getMessage());
+        }
 
-        }
 
         order.setDiscountPercent(discountPercent);
         order.setDiscountedServiceCharge(discountedServiceCharge);
@@ -119,6 +121,8 @@ public class OrderService {
             throw new IllegalArgumentException("order found null");
         }
     }
+
+
 
     public LineItem createLineItem (Product product, Integer quantity, boolean isRefundable, Order order) {
         LineItem lineItem = new LineItem();
@@ -193,12 +197,9 @@ public class OrderService {
         if(order == null) {
             throw new NullPointerException("No order found for given id");
         }
-
         if(!order.isCancelable()) {
             throw new Exception("cannot cancel this order");
         }
-
-
         try {
             orderRepository.delete(order);
         }
@@ -271,7 +272,6 @@ public class OrderService {
                 }
             }
         }
-
         Double total =0.0;
         Double taxTotal = 0.0;
         Double taxPercent = 4.0;
@@ -286,12 +286,23 @@ public class OrderService {
         double discountTotal = discount + order.getDiscountedServiceCharge();
         double grandTotal = total + taxTotal + order.getServiceCharge() - discountTotal;
 
+
+        try {
+            DeliveryInfo deliveryInfo = deliveryInfoService.saveDeliveryInfo(orderRequest, order);
+            order.setDeliveryInfo(deliveryInfo);
+        }
+        catch (NullPointerException e) {
+            logger.error(e.getMessage());
+            throw new NullPointerException(e.getMessage());
+        }
+
+        order.setCancelable(orderRequest.isCancellable());
+        order.setModifiable(orderRequest.isModifiable());
         order.setTotal(total);
         order.setTaxTotal(taxTotal);
         order.setDiscountPercent(discount);
         order.setGrandTotal(grandTotal);
         order.setDiscountTotal(discountTotal);
-
         try {
             orderRepository.save(order);
         }

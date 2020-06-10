@@ -7,4 +7,5 @@ public class Exceptions {
             super(msg);
         }
     }
+
 }
