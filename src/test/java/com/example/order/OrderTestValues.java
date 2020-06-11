@@ -1,6 +1,6 @@
 package com.example.order;
 
-import com.example.order.Pojos.OrderResponse;
+import com.example.order.Pojos.OrderRequest;
 import com.example.order.entity.*;
 
 import java.util.*;
@@ -9,7 +9,8 @@ public class OrderTestValues {
 
     FulfillmentDetails fulfillmentDetails = new FulfillmentDetails(1, "kalimpong");
     FulfillmentOptions fulfillmentOptions = new FulfillmentOptions( 1, "homedelivery");
-
+    
+    Customer customer = new Customer((long) 1, "sakul", "kalimpong", null);
 
     Product product = new Product((long) 1, "mango", "its a fruit", "no",false,null, null, null, null, null,
     null, null, null, 10.00,
@@ -19,20 +20,15 @@ public class OrderTestValues {
     LineItem lineItem = new LineItem((long) 1, null, null, 10, null,11.00,
             null, null, true,0, 0, 0,0);
 
-    DeliveryInfo deliveryInfo = new DeliveryInfo();
-
     Order order = new Order((long) 1, new ArrayList<Product>(){{add(product);}}, null, Calendar.getInstance().getTime(), null ,
     null, null, 10,100,0, 4, 0, 20, 70,
    10,10, 0,0,0,null, null,
-    0, true,true, 40, deliveryInfo);
+    0, true,true, 40, new DeliveryInfo());
 
-
-    OrderResponse orderResponse = new OrderResponse((long) 1, new ArrayList<Product>(){{add(product);}}, null, Calendar.getInstance().getTime(), null ,
-            null, null, 10,100,0, 4, 0, 20, 70,
-            10,10, 0,0,0,null, null,
-            0, true,true, 40, deliveryInfo);
-
-
+    Map<Long, Integer> map = new HashMap<Long, Integer>(){{put((long) 1,3);}};
+    
+    OrderRequest orderRequest = new OrderRequest(map, (long) 1, 4.0, true, true, true, "homedelivery", (long) 1);
+    
     public FulfillmentDetails getFulfillmentDetails() {
         return fulfillmentDetails;
     }
@@ -65,14 +61,6 @@ public class OrderTestValues {
         this.lineItem = lineItem;
     }
 
-    public DeliveryInfo getDeliveryInfo() {
-        return deliveryInfo;
-    }
-
-    public void setDeliveryInfo(DeliveryInfo deliveryInfo) {
-        this.deliveryInfo = deliveryInfo;
-    }
-
     public Order getOrder() {
         return order;
     }
@@ -81,11 +69,19 @@ public class OrderTestValues {
         this.order = order;
     }
 
-    public OrderResponse getOrderResponse() {
-        return orderResponse;
+    public OrderRequest getOrderRequest() {
+        return orderRequest;
     }
 
-    public void setOrderResponse(OrderResponse orderResponse) {
-        this.orderResponse = orderResponse;
+    public void setOrderRequest(OrderRequest orderRequest) {
+        this.orderRequest = orderRequest;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

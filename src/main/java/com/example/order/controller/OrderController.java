@@ -37,11 +37,11 @@ public class OrderController {
             orderService.saveOrder(orderRequest);
             return new ResponseEntity<>("success", HttpStatus.OK);
         }
-        catch (Exceptions.CustomerNotFoundException e){
+        catch (NullPointerException e){
             e.printStackTrace();
-            return new ResponseEntity<>("customer not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        catch (NoSuchFieldException | NullPointerException | IllegalArgumentException e) {
+        catch (NoSuchFieldException | IllegalArgumentException e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +62,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @ApiOperation(value = "fetch an order of provided id", response = Order.class)
-    public ResponseEntity<?> getOrder (@PathVariable("orderId") Long orderId) {
+    public ResponseEntity<?> get0Order (@PathVariable("orderId") Long orderId) {
         OrderResponse order = orderService.findOneOrder(orderId);
         if(order ==null) {
             return new ResponseEntity<>("No order found with given id", HttpStatus.NOT_FOUND);

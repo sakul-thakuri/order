@@ -1,7 +1,9 @@
 package com.example.order;
 
+import com.example.order.Pojos.OrderRequest;
 import com.example.order.entity.*;
 import com.example.order.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -15,7 +17,6 @@ import org.springframework.http.*;
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -30,9 +31,17 @@ public class OrderApiTest {
     @MockBean
     OrderRepository orderRepository;
 
+    @MockBean
+    CustomerRepository customerRepository;
+
+    @MockBean
+    ProductRepository productRepository;
+
+    @MockBean
+    FulfillmentDetailsRepository fulfillmentDetailsRepository;
+
     Logger logger = LoggerFactory.getLogger(OrderApiTest.class);
     OrderTestValues orderTestValues = new OrderTestValues();
-    HttpHeaders headers = new HttpHeaders();
 
    @Nested
    class getOrders {
@@ -72,19 +81,11 @@ public class OrderApiTest {
            assertNotEquals(HttpStatus.OK, response.getStatusCode());
            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
        }
-
-       @Test
-       public void getOrderByIdWithException() {
-           when(orderRepository.findById(anyLong())).thenThrow(NoSuchElementException.class);
-           ResponseEntity<String> response = testRestTemplate.getForEntity("http://localhost:" +port + "/orders/1", String.class);
-           assertNotEquals(HttpStatus.OK, response.getStatusCode());
-           assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-       }
    }
 
    @Nested
    class delete {
-
+       HttpHeaders headers = new HttpHeaders();
        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 
        @Test
@@ -106,5 +107,45 @@ public class OrderApiTest {
        }
    }
 
+
+   @Nested
+   class createOrder {
+
+       OrderRequest orderRequest = orderTestValues.getOrderRequest();
+
+       @BeforeEach
+       public void setup () {
+           when(customerRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getCustomer()));
+           when(productRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getProduct()));
+           when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getFulfillmentDetails()));
+       }
+       @Test
+       public void createOrder () {
+           ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
+           assertEquals(HttpStatus.OK, response.getStatusCode());
+       }
+
+       @Test
+       public void createOrderWithInvalidCustomer () {
+           when(customerRepository.findById(anyLong())).thenReturn(java.util.Optional.empty());
+           ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
+           assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+       }
+
+       @Test
+       public void createOrderWithInvalidDeliveryOption () {
+           orderRequest.setFulfillmentOption("abc");
+           ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
+           assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+       }
+
+       @Test
+       public void createOrderWithEmptyFulfillmentDetails () {
+           orderRequest.setFulfillmentOption("pickup");
+           when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(Optional.empty());
+           ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
+           assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+       }
+   }
 }
 

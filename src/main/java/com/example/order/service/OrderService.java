@@ -5,8 +5,6 @@ import com.example.order.Pojos.OrderResponse;
 import com.example.order.entity.*;
 import com.example.order.exceptions.Exceptions;
 import com.example.order.repository.CustomerRepository;
-import com.example.order.repository.FulfillmentDetailsRepository;
-import com.example.order.repository.FulfillmentOptionRepository;
 import com.example.order.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +24,7 @@ public class OrderService {
     Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     public OrderService(OrderRepository orderRepository, ProductService productService, LineItemService lineItemService,
-                        CustomerRepository customerRepository, FulfillmentOptionRepository fulfillmentOptionRepository,
-                        FulfillmentDetailsRepository fulfillmentDetailsRepository, DeliveryInfoService deliveryInfoService) {
+                        CustomerRepository customerRepository, DeliveryInfoService deliveryInfoService) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.lineItemService = lineItemService;
@@ -70,7 +67,7 @@ public class OrderService {
             }
             Integer quantity = map.getValue();
             productList.add(product);
-
+            logger.info(product.getName());
 
             productPrice = product.getPrice();
 
@@ -80,10 +77,9 @@ public class OrderService {
 
             lineItems.add(createLineItem(product, quantity, isRefundable, order));
             itemsCount += quantity;
-
         }
-        discountTotal = discount + discountedServiceCharge;
 
+        discountTotal = discount + discountedServiceCharge;
         grandTotal = total + taxTotal + serviceCharge - discountTotal;
 
         try {
@@ -131,7 +127,6 @@ public class OrderService {
         lineItem.setUnitPrice(product.getPrice());
         return lineItem;
     }
-
 
     public List<OrderResponse> getOrders() {
         List<Order> orders;
