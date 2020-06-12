@@ -208,19 +208,13 @@ public class OrderService {
     }
 
     public void updateOrder(Long orderId, OrderRequest orderRequest) throws Exception {
-        Optional<Order> orderOptional = orderRepository.findById(orderId);
-        Order order;
-        if(orderOptional.isPresent()) {
-            order = orderOptional.get();
-        }
-        else {
+        Order order = findOrder(orderId);
+        if(order == null) {
             throw new NullPointerException("order not found");
         }
-
         if(!order.isModifiable()) {
             throw new Exception("cannot modify this order");
         }
-
         for(Map.Entry<Long, Integer> map : orderRequest.getProducts().entrySet()) {
             Product product = productService.findById(map.getKey());
             Integer quantity = map.getValue();
@@ -246,12 +240,8 @@ public class OrderService {
                 LineItem lineItem = createLineItem(product, quantity, orderRequest.isRefundable(), order);
                 List<LineItem> lineItems = order.getLineItems();
                 lineItems.add(lineItem);
-                try {
-                    orderRepository.save(order);
-                }
-                catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("order could not be null");
-                }
+
+                orderRepository.save(order);
             }
         }
         double total =0.0;
@@ -291,11 +281,7 @@ public class OrderService {
         order.setDiscountPercent(discount);
         order.setGrandTotal(grandTotal);
         order.setDiscountTotal(discountTotal);
-        try {
-            orderRepository.save(order);
-        }
-        catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("order cannot be null");
-        }
+
+        orderRepository.save(order);
      }
 }

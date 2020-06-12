@@ -1,12 +1,18 @@
 package com.example.order;
 
 import com.example.order.Pojos.OrderRequest;
+import com.example.order.controller.OrderController;
 import com.example.order.entity.*;
+import com.example.order.entity.Order;
 import com.example.order.repository.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.*;
+
 import static org.mockito.Mockito.*;
+
+import org.mockito.InjectMocks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,13 +20,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
+
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @SpringBootTest(classes = OrderApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OrderApiTest {
 
    @LocalServerPort
@@ -38,13 +45,24 @@ public class OrderApiTest {
     ProductRepository productRepository;
 
     @MockBean
+    LineItemRepository lineItemRepository;
+
+    @MockBean
     FulfillmentDetailsRepository fulfillmentDetailsRepository;
 
     Logger logger = LoggerFactory.getLogger(OrderApiTest.class);
     OrderTestValues orderTestValues = new OrderTestValues();
 
+    @BeforeAll
+    public void setUp () {
+        when(orderRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getOrder()));
+        when(customerRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getCustomer()));
+        when(productRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getProduct()));
+        when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getFulfillmentDetails()));
+    }
+
    @Nested
-   class getOrders {
+   class get {
        @Test
        public void getOrders() {
            Order order = orderTestValues.getOrder();
@@ -69,7 +87,6 @@ public class OrderApiTest {
    class getOrder {
        @Test
        public void getOrderById() {
-           when(orderRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getOrder()));
            ResponseEntity<String> response = testRestTemplate.getForEntity("http://localhost:" +port + "/orders/1", String.class);
            assertEquals(HttpStatus.OK, response.getStatusCode());
        }
@@ -90,37 +107,27 @@ public class OrderApiTest {
 
        @Test
        public void deleteOrder() {
-           when(orderRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getOrder()));
            ResponseEntity<String> response = testRestTemplate.exchange("http://localhost:" +port + "/orders/1", HttpMethod.DELETE, entity, String.class);
            assertEquals(HttpStatus.OK, response.getStatusCode());
        }
 
        @Test
        public void deleteOrderWithCancellableAsFalse() {
-
-           Order order = orderTestValues.getOrder();
-           order.setCancelable(false);
-           when(orderRepository.findById(anyLong())).thenReturn(java.util.Optional.of(order));
+           orderTestValues.getOrder().setCancelable(false);
            ResponseEntity<String> response = testRestTemplate.exchange("http://localhost:" +port + "/orders/1", HttpMethod.DELETE, entity, String.class);
            assertNotEquals(HttpStatus.OK, response.getStatusCode());
            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
        }
    }
 
-
    @Nested
    class createOrder {
 
        OrderRequest orderRequest = orderTestValues.getOrderRequest();
 
-       @BeforeEach
-       public void setup () {
-           when(customerRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getCustomer()));
-           when(productRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getProduct()));
-           when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getFulfillmentDetails()));
-       }
        @Test
        public void createOrder () {
+           when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(java.util.Optional.of(orderTestValues.getFulfillmentDetails()));
            ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
            assertEquals(HttpStatus.OK, response.getStatusCode());
        }
@@ -145,6 +152,40 @@ public class OrderApiTest {
            when(fulfillmentDetailsRepository.findById(anyLong())).thenReturn(Optional.empty());
            ResponseEntity<String> response = testRestTemplate.postForEntity("http://localhost:" + port + "/orders", orderRequest, String.class);
            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+       }
+   }
+
+   @Nested
+   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+   class update {
+
+       HttpHeaders headers = new HttpHeaders();
+       ObjectMapper mapper = new ObjectMapper();
+
+       @BeforeAll
+       public void setup () {
+
+           when(lineItemRepository.findByProductAndOrder(any(Order.class), any(Product.class))).thenReturn(orderTestValues.getLineItem());
+           headers.setContentType(MediaType.APPLICATION_JSON);
+       }
+
+       @Test
+       public void updateOrder () throws JsonProcessingException {
+
+           String orderRequestString = mapper.writeValueAsString(orderTestValues.getOrderRequest());
+           HttpEntity<String> entity = new HttpEntity<String>(orderRequestString, headers);
+           ResponseEntity<String> response = testRestTemplate.exchange("http://localhost:" +port + "/orders/1", HttpMethod.PUT, entity, String.class);
+           assertEquals(HttpStatus.OK, response.getStatusCode());
+       }
+
+       @Test
+       public void updateOrderWithModifiableFalse () throws JsonProcessingException {
+           orderTestValues.getOrder().setModifiable(false);
+           String orderRequestString = mapper.writeValueAsString(orderTestValues.getOrderRequest());
+           HttpEntity<String> entity = new HttpEntity<String>(orderRequestString, headers);
+           ResponseEntity<String> response = testRestTemplate.exchange("http://localhost:" +port + "/orders/1", HttpMethod.PUT, entity, String.class);
+           assertNotEquals(HttpStatus.OK, response.getStatusCode());
+           assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
        }
    }
 }

@@ -17,11 +17,11 @@ public class OrderTestValues {
     new ArrayList<FulfillmentOptions>(){{add(fulfillmentOptions);}}, new ArrayList<FulfillmentDetails>(){{add(fulfillmentDetails);}},
     null);
 
-    LineItem lineItem = new LineItem((long) 1, null, null, 10, null,11.00,
+    LineItem lineItem = new LineItem((long) 1, product, null, 10, null,11.00,
             null, null, true,0, 0, 0,0);
 
-    Order order = new Order((long) 1, new ArrayList<Product>(){{add(product);}}, null, Calendar.getInstance().getTime(), null ,
-    null, null, 10,100,0, 4, 0, 20, 70,
+    Order order = new Order((long) 1, new ArrayList<Product>(){{add(product);}}, null, Calendar.getInstance().getTime(), new ArrayList<LineItem>(){{add(lineItem);}} ,
+    customer, null, 10,100,0, 4, 0, 20, 70,
    10,10, 0,0,0,null, null,
     0, true,true, 40, new DeliveryInfo());
 
