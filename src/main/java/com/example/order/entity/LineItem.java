@@ -3,6 +3,10 @@ package com.example.order.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -11,6 +15,10 @@ import java.util.UUID;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LineItem {
 
     @Id
@@ -36,131 +44,4 @@ public class LineItem {
     private long quantityCompletedRefunds;
     private long quantityPendingRefunds;
     // private List<FulfillmentStatus> fulfillmentStatuses;
-
-
-    public LineItem() {
-    }
-
-    public LineItem(long id, Product product, Order order, Integer quantity, String description,
-                    double unitPrice, String specialInstruction, String imageLocation, boolean isRefundable,
-                    long quantityRefunded, long quantityRefundable, long quantityCompletedRefunds,
-                    long quantityPendingRefunds) {
-        this.id = id;
-        this.product = product;
-        this.order = order;
-        this.quantity = quantity;
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.specialInstruction = specialInstruction;
-        this.imageLocation = imageLocation;
-        this.isRefundable = isRefundable;
-        this.quantityRefunded = quantityRefunded;
-        this.quantityRefundable = quantityRefundable;
-        this.quantityCompletedRefunds = quantityCompletedRefunds;
-        this.quantityPendingRefunds = quantityPendingRefunds;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public double getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public String getSpecialInstruction() {
-        return specialInstruction;
-    }
-
-    public void setSpecialInstruction(String specialInstruction) {
-        this.specialInstruction = specialInstruction;
-    }
-
-    public String getImageLocation() {
-        return imageLocation;
-    }
-
-    public void setImageLocation(String imageLocation) {
-        this.imageLocation = imageLocation;
-    }
-
-    public boolean isRefundable() {
-        return isRefundable;
-    }
-
-    public void setRefundable(boolean refundable) {
-        isRefundable = refundable;
-    }
-
-    public long getQuantityRefunded() {
-        return quantityRefunded;
-    }
-
-    public void setQuantityRefunded(long quantityRefunded) {
-        this.quantityRefunded = quantityRefunded;
-    }
-
-    public long getQuantityRefundable() {
-        return quantityRefundable;
-    }
-
-    public void setQuantityRefundable(long quantityRefundable) {
-        this.quantityRefundable = quantityRefundable;
-    }
-
-    public long getQuantityCompletedRefunds() {
-        return quantityCompletedRefunds;
-    }
-
-    public void setQuantityCompletedRefunds(long quantityCompletedRefunds) {
-        this.quantityCompletedRefunds = quantityCompletedRefunds;
-    }
-
-    public long getQuantityPendingRefunds() {
-        return quantityPendingRefunds;
-    }
-
-    public void setQuantityPendingRefunds(long quantityPendingRefunds) {
-        this.quantityPendingRefunds = quantityPendingRefunds;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
 }

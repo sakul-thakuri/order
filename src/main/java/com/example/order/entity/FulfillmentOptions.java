@@ -1,9 +1,17 @@
 package com.example.order.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class FulfillmentOptions {
 
     @Id
@@ -11,27 +19,4 @@ public class FulfillmentOptions {
     private long id;
     private String fulfillmentType;
 
-    public FulfillmentOptions() {
-    }
-
-    public FulfillmentOptions(long id, String fulfillmentType) {
-        this.id = id;
-        this.fulfillmentType = fulfillmentType;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getFulfillmentType() {
-        return fulfillmentType;
-    }
-
-    public void setFulfillmentType(String fulfillmentType) {
-        this.fulfillmentType = fulfillmentType;
-    }
 }

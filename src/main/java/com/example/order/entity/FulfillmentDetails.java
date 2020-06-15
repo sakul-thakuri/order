@@ -1,36 +1,21 @@
 package com.example.order.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class FulfillmentDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long storeId;
     String storeAddress;
 
-    public FulfillmentDetails() {
-    }
-
-    public FulfillmentDetails(long storeId, String storeAddress) {
-        this.storeId = storeId;
-        this.storeAddress = storeAddress;
-    }
-
-    public long getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(long storeId) {
-        this.storeId = storeId;
-    }
-
-    public String getStoreAddress() {
-        return storeAddress;
-    }
-
-    public void setStoreAddress(String storeAddress) {
-        this.storeAddress = storeAddress;
-    }
 }

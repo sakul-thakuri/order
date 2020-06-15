@@ -1,11 +1,19 @@
 package com.example.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeliveryInfo {
 
     @Id
@@ -14,24 +22,5 @@ public class DeliveryInfo {
     @OneToOne
     @JsonIgnore
     Order order;
-
-    public DeliveryInfo() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
 
 }
