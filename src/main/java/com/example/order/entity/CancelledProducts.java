@@ -1,30 +1,24 @@
 package com.example.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Customer {
+public class CancelledProducts {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
-    String address;
-
-    @OneToMany (mappedBy = "customer")
-    @JsonIgnore
-    List<Order> orderList;
+    long id;
 }

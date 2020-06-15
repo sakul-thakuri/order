@@ -12,9 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -29,6 +26,7 @@ public class Categories {
     private String name;
 
     @ManyToMany (mappedBy = "categories", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JsonIgnore
     private Set<Product> productList = new HashSet<>();
 
 }
